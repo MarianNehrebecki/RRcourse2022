@@ -1,0 +1,120 @@
+---
+title: "ASSIGNMENT 2 (for 30/31.03.2022)"
+author: "Marian Nehrebecki"
+date: "3/29/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+<br>
+<center>
+
+<a href="/wiki/File:TheMiddlelogo.png" class="image"><img alt="TheMiddlelogo.png" src="//upload.wikimedia.org/wikipedia/commons/thumb/4/49/TheMiddlelogo.png/250px-TheMiddlelogo.png" decoding="async" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/4/49/TheMiddlelogo.png/375px-TheMiddlelogo.png 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/4/49/TheMiddlelogo.png/500px-TheMiddlelogo.png 2x" data-file-width="1280" data-file-height="227" width="250" height="44"></a>
+
+</center>
+
+
+
+***
+
+### A brief description
+
+> (From the [Wikipedia](https://en.wikipedia.org/wiki/The_Middle_(TV_series))) **The Middle** is an American television sitcom that premiered on September 30, 2009, on ABC, and concluded on May 22, 2018. The series follows an Indiana residing lower middle class family living and facing the day-to-day struggles of home life, work, and raising children. The series stars *Patricia Heaton* and *Neil Flynn*. The Middle was created by former *Roseanne* and *Murphy Brown* writers *Eileen Heisler* and *DeAnn Heline* of Blackie and Blondie Productions. The show is produced by *Warner Bros*. Television and Blackie and Blondie Productions. The Middle was praised by television critics and earned numerous award nominations.
+
+> A spin-off of the series, centered around *Eden Sher's* character, *Sue Heck*, was set to launch in 2019. However, ABC passed on the project. It was shopped to other networks but was never picked up.
+
+***
+
+
+### A summary of some basic statistics
+
+**Table 1.** Basic statistics about seasons
+
+| Season | Episodes  | Rank (viewers) | Viewers (in millions) |
+|:------:|:---------:|:--------------:|:---------------------:|
+| 1      | 24        | 68             | 6.69                  |
+| 2      | 24        | 51             | 8.08                  |
+| 3      | 24        | 60             | 8.08                  |
+| 4      | 24        | 45             | 8.42                  |
+| 5      | 24        | 44             | 8.24                  |
+| 6      | 24        | 53             | 8.68                  |
+| 7      | 24        | 53             | 8.15                  |
+| 8      | 23        | 53             | 7.02                  |
+| 9      | 24        | 53             | 7.28                  |
+
+**Comments:** 
+
+* Each of the seasons has 24 episodes excluding the `eight` episode.
+* The highest rank is for the `first` season.
+* The `sixth` season has the highest number of viewers.
+
+***
+
+### The viewership over time
+
+
+
+
+```{r, include=F}
+library(ggplot2)
+```
+
+
+```{r viewers_plot1, fig.align='center', echo=F}
+data <- data.frame(Time = c(2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017),
+                   Viewers = c(6.69, 8.08, 8.08, 8.42, 8.24, 8.68, 8.15, 7.02, 7.28))
+
+
+
+ggplot(data, aes(x = as.factor(Time), y = Viewers)) +
+  geom_col(position = "stack",
+           fill = "lightgreen") +
+  geom_text(aes(label = Viewers)) +
+  labs(x = "Years",
+       y = "Viewers (in millions)",
+       title = "Figure 1. Viewers in (millions) by years"
+            )
+```
+
+**Comments:** 
+
+1. In `r data[data$Viewers==max(data$Viewers),]$Time` was the highest number of viewers and equal `r max(data$Viewers)` in millions.
+
+2. The viewership decreased by  `r max(data$Viewers) - min(data$Viewers)` in millions
+between `r data[data$Viewers==max(data$Viewers),]$Time` and `r data[data$Viewers==min(data$Viewers),]$Time` years.
+
+***
+
+### The season-to-season changes in viewership
+
+
+
+
+```{r viewers_plot2, fig.align='center', echo=F}
+data <- data.frame(Season = 1:9,
+                   Viewers = c(6.69, 8.08, 8.08, 8.42, 8.24, 8.68, 8.15, 7.02, 7.28))
+
+
+
+ggplot(data, aes(x = as.factor(Season), y = Viewers)) +
+  geom_col(position = "stack",
+           fill = "grey") +
+  geom_text(aes(label = Viewers)) +
+  labs(x = "Season",
+       y = "Viewers (in millions)",
+       title = "Figure 2. Viewers in (millions) by seasons"
+            )
+```
+
+
+**Comments:** 
+
+1. The average number of viewers was `r round(mean(data$Viewers),2)` in millions.
+
+2. The median number of viewers was `r median(data$Viewers)` in millions.
+
+***
