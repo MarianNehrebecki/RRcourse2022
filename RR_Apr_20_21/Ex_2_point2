@@ -1,0 +1,8 @@
+def reverse_int(n: int) -> int:
+    """ Function reverses integer number like 7245 -> 5427.
+    To do so it converts int to str, reverses str and converts str to int back
+    """
+    return int(str(n)[::-1])
+
+
+print(reverse_int(7245))
