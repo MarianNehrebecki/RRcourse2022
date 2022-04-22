@@ -1,0 +1,17 @@
+fibs = [1, 1]
+
+
+def largest_fib(n: int) -> int:
+    """ Method is returning the greatest number
+    from fibonacci sequence, lower than given n.
+    """
+    previous = 0
+    last = 1
+    while fibs[last] < n:
+        fibs.append(fibs[previous] + fibs[last])
+        previous += 1
+        last += 1
+    return fibs[previous]
+
+
+print(largest_fib(1000))
