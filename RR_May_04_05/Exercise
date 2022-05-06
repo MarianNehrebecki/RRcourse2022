@@ -1,0 +1,28 @@
+#### 1. Write a function in your preferred language which allows the user to convert the temperature in Fahrenheit degrees
+
+def convert(f, target='c'):
+    if target == 'c':
+        return (f - 32) / 1.8
+    elif target == 'k':
+        return ((f - 32) / 1.8) + 273.15
+    else:
+        raise Exception('wrong target')
+        
+#### 2. Check whether 50, 70, and 90 degrees Fahrenheit are converted correctly to Celsius.
+
+convert(50, target='c')
+convert(70, target='c')
+convert(90, target='c')
+
+import unittest
+import sys
+
+class TestDivide(unittest.TestCase):
+    def converted_correctly_to_Celsius(self):
+        self.assertEqual(convert(50, target='c'), 10)
+        self.assertAlmostEqual(convert(70, target='c'), 21.11111111111111)
+        self.assertAlmostEqual(convert(90, target='c'), 32.22222222222222)
+                         
+                         
+if __name__ == '__main__':
+    unittest.main()              
