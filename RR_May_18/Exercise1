@@ -10,8 +10,7 @@ Imported files are written to the home directory.
 localhost:~# uname -a
 Linux localhost 4.12.0-rc6-g48ec1f0-dirty #21 Fri Aug 4 21:02:28 CEST 2017 i586
 Linux
-localhost:~# test.txt
-sh: test.txt: not found
+
 localhost:~# touch test.txt
 localhost:~# ls -l
 total 16
