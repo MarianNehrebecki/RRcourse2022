@@ -1,0 +1,378 @@
+---
+title: "Metaanalysis in R - exercise"
+author: "Marian Nehrebecki"
+date: "5/21/2022"
+output:  
+  html_document:
+    theme: united
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(meta)
+library(metafor)
+library(dplyr)
+
+setwd("/Users/nehrebeckiwp.pl/Desktop/RRcourse2022-main/RR_May_19_25/RRcourse2022/RR_May_19_25")
+```
+
+# ASSIGNMENT 
+
+1) Import the data from the `data\metaanalysis_data.xlsx` file. The data come from the meta-analysis study: [Todd et al., 2017 - Sex differences in children's toy preferences: A systematic review, meta‐regression, and meta‐analysis](https://onlinelibrary.wiley.com/doi/full/10.1002/icd.2064)
+
+The study looks at various studies of children choosing what kind of toys they play with (stereotypically 'boy-toys' or stereotypically 'girl-toys'). Mean times (in seconds) of playing are recorded, along with sample sizes and standard errors (for boys playing with both kinds of toys and for girls playing with both kinds of toys).
+
+There's also information about the studies (e.g. year) and a bit about quality.
+
+Here's authors' descriptions to the data:
+
+> Neutral toys (1 = neutral toys included; 2 = neutral toys not included); Parent present (1 = absent; 2 = minimal interaction; 3 = moderate or full interaction); Setting = location of study (1 = home; 2 = laboratory; 3 = nursery); Country = gender inequality index, a measure of how gender egalitarian the country was at the time the study took place.
+
+> Note. Quality is assessed using Newcastle–Ottawa Quality Assessment Scale criteria adapted for this study. A star indicates that the study fulfilled this criterion; an X indicates that the
+study did not fulfil this criterion. 
+Case definition adequate: clear justification for the gendered nature of a toy, for example, based on research. 
+Representativeness of cases: recruitment of consecutive participants. 
+Selection of controls: whether boys and girls were comparable in terms of social background.
+Parental opinion: whether parents' views on gender were measured.
+Comparability of both groups: the toys were comparable (in size, shape, etc.) and if the boys and girls were comparable in age. 
+Ascertainment of behaviour: Play behaviour was clearly defined. 
+Same ascertainment method for both groups: The measurement of the outcome (time spent playing with toy) was clearly defined. 
+Nonresponse rate: whether either nonuptake or dropout rates reported.
+
+2) Experiment using what you've learned :)
+
+
+
+
+```{r}
+# Loading
+library("readxl")
+# xlsx files
+my_data <- read_excel("data/metaanalysis_data.xlsx")
+my_data[1:5,]
+```
+
+In order to solve this exercise four cases are considered.
+
+# Case 1 - Girls play male's toys
+
+## Goal: finding the true/combined effect size
+
+The function `meta::metagen` is used to estimate the overall effect size. 
+
+We start with Fixed Effect Model.
+
+```{r}
+girls_male_FE <- metagen(
+             TE=Mean_girls_play_male,
+             seTE=SD_girls_play_male,
+             data=my_data,
+             studlab=paste(Study),
+             comb.fixed = TRUE,
+             comb.random = FALSE)
+girls_male_FE
+```
+
+> **Comments** <br>
+
+* Common effect model is significant and equal to 19.5901.
+* Based on Test of heterogeneity there is no grounds to reject H0.
+
+Next we use Random Effects Model.
+
+```{r}
+girls_male_RE <- metagen(
+            TE=Mean_girls_play_male,
+             seTE=SD_girls_play_male,
+             data=my_data,
+             studlab=paste(Study),
+             comb.fixed = FALSE,
+             comb.random = TRUE)
+girls_male_RE
+```
+
+> **Comments** <br>
+
+* Random effects model is significant and equal to 19.5901.
+* Based on Test of heterogeneity there is no grounds to reject H0.
+
+Next we analyze Forest graph for FE model.
+
+```{r}
+girls_male_FE %>% forest(sortvar=Mean_girls_play_male)
+```
+
+>**Comments** <br>
+
+* This forest plot summarizes the effect sizes of all studies in the meta-analysis in a single plot along with their 95% confidence intervals. 
+* A dashed vertical line indicates a zero effect.
+* In the case 1, we can see that in most studies there is some consistency in the reported effect size.
+
+Next we analyze Forest graph for RE model.
+
+```{r}
+girls_male_RE %>% forest(sortvar=Mean_girls_play_male)
+```
+
+>**Comments** <br>
+
+The same results like in Fixed Effect Model.
+
+## Goal: verifying the reliability of the literature
+
+For Fixed Effect Model we use Funnel Plot.
+
+```{r}
+girls_male_FE %>% funnel()
+```
+
+>**Comments** <br>
+
+* Based on the Funnel plot we can see that observations from studies behave non-symmetric. So we suspect that exists publication bias.
+
+```{r}
+girls_male_RE %>% funnel()
+```
+
+The simalar results after RE models.
+
+# Case 2 - Boys play male's toys
+
+## Goal: finding the true/combined effect size
+
+We start with Fixed Effect Model.
+
+```{r}
+boys_male_FE <- metagen(
+            TE=Mean_boys_play_male,
+             seTE=SD_boys_play_male,
+             data=my_data,
+             studlab=paste(Study),
+             comb.fixed = TRUE,
+             comb.random = FALSE)
+boys_male_FE
+```
+
+>**Comments** <br>
+
+* Common effect model is significant and equal to 96.0551.
+* Based on Test of heterogeneity we reject H0.
+
+Next we use Random Effects Model.
+
+
+```{r}
+boys_male_RE <- metagen(
+             TE=Mean_boys_play_male,
+             seTE=SD_boys_play_male,
+             data=my_data,
+             studlab=paste(Study),
+             comb.fixed = FALSE,
+             comb.random = TRUE)
+boys_male_RE
+```
+
+> **Comments** <br>
+
+* Random effects model is significant and equal to 138.2605.
+* Based on Test of heterogeneity we reject H0.
+
+Next we analyze Forest graph for FE model.
+
+
+```{r, results='hide', fig.height=4}
+boys_male_FE %>% forest(sortvar=Mean_boys_play_male)
+```
+
+> **Comments** <br>
+
+* In the case 2, we can see that in most studies there is some consistency in the reported effect size.
+
+
+```{r, results='hide', fig.height=4}
+boys_male_RE %>% forest(sortvar=Mean_boys_play_male)
+```
+
+>**Comments** <br>
+
+* The same results like in Fixed Effect Model.
+
+## Goal: verifying the reliability of the literature (Checking for publication bias)
+
+For Fixed Effect Model we use Funnel Plot.
+
+```{r}
+boys_male_FE %>% funnel()
+```
+
+>**Comments** <br>
+
+* Based on the Funnel plot we can see that observations from studies behave non-symmetric. So we suspect that exists publication bias.
+
+```{r}
+boys_male_RE %>% funnel()
+```
+
+>**Comments** <br>
+
+* The simalar results after RE models.
+
+# Case 3 - Boys play female's toys
+
+## Goal: finding the true/combined effect size
+
+We start with Fixed Effect Model.
+
+```{r}
+boys_female_FE <- metagen(
+             TE=Mean_boys_play_female,
+             seTE=SD_boys_play_female,
+             data=my_data,
+             studlab=paste(Study),
+             comb.fixed = TRUE,
+             comb.random = FALSE)
+boys_male_FE
+```
+
+>**Comments** <br>
+
+* Common effect model is significant and equal to 96.0551.
+* Based on Test of heterogeneity we reject H0.
+
+Next we use Random Effects Model.
+
+
+```{r}
+boys_female_RE <- metagen(
+             TE=Mean_boys_play_female,
+             seTE=SD_boys_play_female,
+             data=my_data,
+             studlab=paste(Study),
+             comb.fixed = FALSE,
+             comb.random = TRUE)
+boys_female_RE
+```
+
+>**Comments**
+
+* Random effects model is significant and equal to 17.2890.
+* Based on Test of heterogeneity there is no grounds to reject H0.
+
+Next we analyze Forest graph for FE model.
+
+```{r, results='hide', fig.height=4}
+boys_female_FE %>% forest(sortvar=Mean_boys_play_female)
+```
+
+> **Comments**
+
+* In the case 3, we can see that in minority studies there is some consistency in the reported effect size.
+
+```{r, results='hide', fig.height=4}
+boys_female_RE %>% forest(sortvar=Mean_boys_play_female)
+```
+
+>**Comments** <br>
+
+* The same results like in Fixed Effect Model.
+
+## Goal: verifying the reliability of the literature (Checking for publication bias)
+
+For Fixed Effect Model we use Funnel Plot.
+
+```{r}
+boys_male_RE %>% funnel()
+```
+
+>**Comments** <br>
+
+* Based on the Funnel plot we can see that observations from studies behave non-symmetric. So we suspect that exists publication bias.
+
+```{r}
+boys_male_RE %>% funnel()
+```
+
+>**Comments** <br>
+
+* The similar results after RE models.
+
+# Case 4 - Girs play male's toys
+
+## Goal: finding the true/combined effect size
+
+We start with Fixed Effect Model.
+
+```{r}
+girls_female_FE <- metagen(
+             TE=Mean_girls_play_female,
+             seTE=SD_girls_play_female,
+             data=my_data,
+             studlab=paste(Study),
+             comb.fixed = TRUE,
+             comb.random = FALSE)
+boys_female_FE
+```
+
+> **Comments** <br>
+
+* Common effect model is significant and equal to 14.5796.
+* Based on Test of heterogeneity there is no grounds reject H0.
+
+Next we use Random Effects Model.
+
+```{r}
+girls_female_RE <- metagen(
+             TE=Mean_girls_play_female,
+             seTE=SD_girls_play_female,
+             data=my_data,
+             studlab=paste(Study),
+             comb.fixed = FALSE,
+             comb.random = TRUE)
+boys_female_RE
+```
+
+
+> **Comments**
+
+* Random effects model is significant and equal to 17.2890.
+* Based on Test of heterogeneity there is no grounds to reject H0.
+
+Next we analyze Forest graph for FE model.
+
+```{r, results='hide', fig.height=4}
+girls_female_FE %>% forest(sortvar=Mean_girls_play_female)
+```
+
+> **Comments** <br>
+
+* In the case 4, we can see that in minority studies there is some consistency in the reported effect size.
+
+```{r, results='hide', fig.height=4}
+girls_female_RE %>% forest(sortvar=Mean_girls_play_female)
+```
+
+>**Comments** <br>
+
+* The same results like in Fixed Effect Model.
+
+## Goal: verifying the reliability of the literature (Checking for publication bias)
+
+For Fixed Effect Model we use Funnel Plot.
+
+```{r}
+girls_female_FE %>% funnel()
+```
+
+ >**Comments** <br>
+
+* Based on the Funnel plot we can see that observations from studies behave non-symmetric. So we suspect that exists publication bias.
+
+```{r}
+girls_female_RE %>% funnel()
+```
+
+>**Comments** <br>
+
+* The simalar results after RE models.
